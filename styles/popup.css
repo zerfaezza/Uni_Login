@@ -1,0 +1,287 @@
+/* TU Dresden Auto Login Popup Styles */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  width: 360px;
+  padding: 0;
+  background: #002557;
+  color: #333;
+}
+
+#popup-content {
+  background: white;
+  overflow: hidden;
+  opacity: 1;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  background: #002557;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.header img {
+  width: 40px;
+  height: 40px;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+/* Form */
+#loginForm {
+  padding: 24px;
+}
+
+label {
+  display: block;
+  margin-top: 16px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #002557;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+label:first-of-type {
+  margin-top: 0;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #e0e8f0;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #eee;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #002557;
+  background: white;
+  box-shadow: inset 0 0 0 1px #002557;
+}
+
+/* Input Container with Toggle Button */
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+/* Toggle Visibility Button */
+.toggle-visibility {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.toggle-visibility:hover {
+  opacity: 0.7;
+}
+
+.toggle-visibility:active {
+  opacity: 0.5;
+}
+
+.toggle-visibility img {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) saturate(100%) invert(22%) sepia(28%) saturate(2294%) hue-rotate(191deg) brightness(93%) contrast(90%);
+  transition: filter 0.2s ease;
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+button[type="button"] {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#saveBtn {
+  background: #dd2727;
+  color: white;
+}
+
+#saveBtn:hover {
+  background: #c72020;
+}
+
+#saveBtn:active {
+  background: #b01d1d;
+}
+
+#clearBtn {
+  background: #f0f4f8;
+  color: #dd2727;
+  border: 1px solid #dd2727;
+}
+
+#clearBtn:hover {
+  background: #f0f4f8;
+  border-color: #002557;
+  color: #002557;
+}
+
+#clearBtn:active {
+  background: #e0e8f0;
+}
+
+/* Status Message */
+#status {
+  margin-top: 16px;
+  padding: 12px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+#status:not(:empty) {
+  background: #f0f4f8;
+  border-color: #002557;
+  color: #002557;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0f4f8;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #274275;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #002557;
+}
+
+/* Custom Confirmation Dialog */
+#confirmDialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+.confirm-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 280px;
+  z-index: 1001;
+}
+
+.confirm-box p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  color: #333;
+  text-align: center;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirm-buttons button {
+  padding: 10px 24px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+#confirmYes {
+  background: #dd2727;
+  color: white;
+}
+
+#confirmYes:hover {
+  background: #c01f1f;
+}
+
+#confirmNo {
+  background: #eee;
+  color: #333;
+  border: 2px solid #274275;
+}
+
+#confirmNo:hover {
+  background: #ddd;
+}

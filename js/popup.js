@@ -3,11 +3,14 @@
 const usernameEl = document.getElementById('username');
 const passwordEl = document.getElementById('password');
 const indexSecretEl = document.getElementById('indexSecret');
-const keepOpenChk = document.getElementById('keepOpenChk');
-const openWindowBtn = document.getElementById('openWindowBtn');
+const showPasswordBtn = document.getElementById('showPasswordBtn');
+const showIndexBtn = document.getElementById('showIndexBtn');
 const saveBtn = document.getElementById('saveBtn');
 const clearBtn = document.getElementById('clearBtn');
 const statusEl = document.getElementById('status');
+const confirmDialog = document.getElementById('confirmDialog');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
 function showStatus(msg, color = 'green') {
     if (!statusEl)
         return;
@@ -24,60 +27,31 @@ function loadValues() {
                 passwordEl.value = items.password;
             if (items.indexSecret && indexSecretEl)
                 indexSecretEl.value = items.indexSecret;
-            if (items.keepOpen !== undefined && keepOpenChk)
-                keepOpenChk.checked = !!items.keepOpen;
         });
-    }
-    else if (typeof browser !== 'undefined' && browser.storage) {
-        browser.storage.local.get(['username', 'password', 'indexSecret']).then((items) => {
-            if (items.username && usernameEl)
-                usernameEl.value = items.username;
-            if (items.password && passwordEl)
-                passwordEl.value = items.password;
-            if (items.indexSecret && indexSecretEl)
-                indexSecretEl.value = items.indexSecret;
-        });
-    }
-    else {
-        if (usernameEl)
-            usernameEl.value = localStorage.getItem('username') || '';
-        if (passwordEl)
-            passwordEl.value = localStorage.getItem('password') || '';
-        if (indexSecretEl)
-            indexSecretEl.value = localStorage.getItem('indexSecret') || '';
-        if (keepOpenChk)
-            keepOpenChk.checked = localStorage.getItem('keepOpen') === '1';
     }
 }
 function saveValues() {
     const data = {
         username: usernameEl ? usernameEl.value : '',
         password: passwordEl ? passwordEl.value : '',
-        indexSecret: indexSecretEl ? indexSecretEl.value : '',
-        keepOpen: keepOpenChk ? !!keepOpenChk.checked : false
+        indexSecret: indexSecretEl ? indexSecretEl.value : ''
     };
     if (typeof chrome !== 'undefined' && chrome.storage) {
         chrome.storage.local.set(data, () => {
             showStatus('Saved');
         });
     }
-    else if (typeof browser !== 'undefined' && browser.storage) {
-        browser.storage.local.set(data).then(() => showStatus('Saved'));
-    }
-    else {
-        if (data.username)
-            localStorage.setItem('username', data.username);
-        if (data.password)
-            localStorage.setItem('password', data.password);
-        if (data.indexSecret)
-            localStorage.setItem('indexSecret', data.indexSecret);
-        localStorage.setItem('keepOpen', data.keepOpen ? '1' : '0');
-        showStatus('Saved (localStorage)');
-    }
 }
-function clearValues() {
-    if (!confirm('Clear saved credentials?'))
-        return;
+function clearValues(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    // Show custom confirmation dialog
+    if (confirmDialog)
+        confirmDialog.style.display = 'block';
+}
+function performClear() {
     if (typeof chrome !== 'undefined' && chrome.storage) {
         chrome.storage.local.remove(['username', 'password', 'indexSecret'], () => {
             if (usernameEl)
@@ -89,64 +63,60 @@ function clearValues() {
             showStatus('Cleared', 'red');
         });
     }
-    else if (typeof browser !== 'undefined' && browser.storage) {
-        browser.storage.local.remove(['username', 'password', 'indexSecret']).then(() => {
-            if (usernameEl)
-                usernameEl.value = '';
-            if (passwordEl)
-                passwordEl.value = '';
-            if (indexSecretEl)
-                indexSecretEl.value = '';
-            showStatus('Cleared', 'red');
-        });
-    }
-    else {
-        localStorage.removeItem('username');
-        localStorage.removeItem('password');
-        localStorage.removeItem('indexSecret');
-        localStorage.removeItem('keepOpen');
-        if (usernameEl)
-            usernameEl.value = '';
-        if (passwordEl)
-            passwordEl.value = '';
-        if (indexSecretEl)
-            indexSecretEl.value = '';
-        showStatus('Cleared', 'red');
-    }
+    if (confirmDialog)
+        confirmDialog.style.display = 'none';
 }
-saveBtn?.addEventListener('click', saveValues);
+function cancelClear() {
+    if (confirmDialog)
+        confirmDialog.style.display = 'none';
+}
+saveBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    saveValues();
+});
 clearBtn?.addEventListener('click', clearValues);
+confirmYes?.addEventListener('click', performClear);
+confirmNo?.addEventListener('click', cancelClear);
 document.addEventListener('DOMContentLoaded', () => {
     loadValues();
     // prevent copying from password and indexSecret fields
     const blockCopy = (e) => e.preventDefault();
-        passwordEl?.addEventListener('copy', blockCopy);
-        indexSecretEl?.addEventListener('copy', blockCopy);
-        passwordEl?.addEventListener('cut', blockCopy);
-        indexSecretEl?.addEventListener('cut', blockCopy);
+    passwordEl?.addEventListener('copy', blockCopy);
+    indexSecretEl?.addEventListener('copy', blockCopy);
+    passwordEl?.addEventListener('cut', blockCopy);
+    indexSecretEl?.addEventListener('cut', blockCopy);
     // block keyboard shortcuts (Ctrl/Cmd+C/X/A) and selection
-        const blockCopyKey = (e) => {
-            const k = e.key?.toLowerCase();
-            if ((e.ctrlKey || e.metaKey) && (k === 'c' || k === 'x' || k === 'a')) {
-                e.preventDefault();
-            }
-        };
-        passwordEl?.addEventListener('keydown', blockCopyKey);
-        indexSecretEl?.addEventListener('keydown', blockCopyKey);
-        passwordEl?.addEventListener('selectstart', (e) => e.preventDefault());
-        indexSecretEl?.addEventListener('selectstart', (e) => e.preventDefault());
+    const blockCopyKey = (e) => {
+        const k = e.key?.toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && (k === 'c' || k === 'x' || k === 'a')) {
+            e.preventDefault();
+        }
+    };
+    passwordEl?.addEventListener('keydown', blockCopyKey);
+    indexSecretEl?.addEventListener('keydown', blockCopyKey);
+    passwordEl?.addEventListener('selectstart', (e) => e.preventDefault());
+    indexSecretEl?.addEventListener('selectstart', (e) => e.preventDefault());
     // disable context menu on those fields to reduce copy
     passwordEl?.addEventListener('contextmenu', (e) => e.preventDefault());
     indexSecretEl?.addEventListener('contextmenu', (e) => e.preventDefault());
-    openWindowBtn?.addEventListener('click', () => {
-        try {
-            if (typeof chrome !== 'undefined' && chrome.windows && chrome.windows.create) {
-                chrome.windows.create({ url: chrome.runtime.getURL('popup.html'), type: 'popup', width: 360, height: 420 });
-            }
-            else {
-                window.open('popup.html', '_blank', 'popup,noopener,width=360,height=420');
-            }
+    // Toggle password visibility on click
+    const toggleVisibility = (input, btn) => {
+        const isVisible = input.type === 'text';
+        input.type = isVisible ? 'password' : 'text';
+        const visOff = btn.querySelector('.vis-off');
+        const visOn = btn.querySelector('.vis-on');
+        if (visOff && visOn) {
+            visOff.style.display = isVisible ? '' : 'none';
+            visOn.style.display = isVisible ? 'none' : '';
         }
-        catch (e) { /* ignore */ }
+    };
+    showPasswordBtn?.addEventListener('click', () => {
+        if (passwordEl)
+            toggleVisibility(passwordEl, showPasswordBtn);
+    });
+    showIndexBtn?.addEventListener('click', () => {
+        if (indexSecretEl)
+            toggleVisibility(indexSecretEl, showIndexBtn);
     });
 });

@@ -3,43 +3,60 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Uni Login</title>
-  <style>
-    body { font-family: Arial, sans-serif; width:320px; padding:12px; }
-    label { display:block; margin-top:8px; font-size:13px }
-    input[type=text], input[type=password] { width:100%; padding:6px; box-sizing:border-box; margin-top:4px }
-    button { margin-top:12px; padding:8px 12px }
-    #status { margin-top:8px; font-size:12px; color:green }
-  </style>
+  <title>TU Dresden Auto Login</title>
+  <link rel="stylesheet" href="styles/popup.css" />
 </head>
 <body>
-  <div style="display:flex; align-items:center; gap:8px">
-    <picture>
-      <source type="image/svg+xml" srcset="icons/logo.svg" />
-      <img src="icons/icon-128.png" alt="Logo" style="width:40px; height:40px; display:block;" />
-    </picture>
-    <h3 style="margin:0">Uni Login</h3>
+  <div id="popup-content">
+    <div class="header">
+      <picture>
+        <source type="image/svg+xml" srcset="icons/logo.svg" />
+        <img src="icons/icon-128.png" alt="Logo" />
+      </picture>
+      <h3>TU Dresden Auto Login</h3>
+    </div>
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input id="username" type="text" autocomplete="username" placeholder="Enter your username" />
+
+      <label for="password">Password</label>
+      <div class="input-group">
+        <input id="password" type="password" autocomplete="current-password" placeholder="Enter your password" />
+        <button id="showPasswordBtn" type="button" class="toggle-visibility">
+          <img src="svg/visibility_off.svg" alt="Show" class="vis-off" />
+          <img src="svg/visibility.svg" alt="Hide" class="vis-on" style="display:none" />
+        </button>
+      </div>
+
+      <label for="indexSecret">Index Secret</label>
+      <div class="input-group">
+        <input id="indexSecret" type="password" autocomplete="off" placeholder="Enter your index secret" />
+        <button id="showIndexBtn" type="button" class="toggle-visibility">
+          <img src="svg/visibility_off.svg" alt="Show" class="vis-off" />
+          <img src="svg/visibility.svg" alt="Hide" class="vis-on" style="display:none" />
+        </button>
+      </div>
+
+      <div class="button-group">
+        <button id="saveBtn" type="button">Save</button>
+        <button id="clearBtn" type="button">Clear</button>
+      </div>
+      
+      <div id="status"></div>
+    </form>
+    
+    <!-- Custom confirmation dialog -->
+    <div id="confirmDialog" style="display:none;">
+      <div class="confirm-overlay"></div>
+      <div class="confirm-box">
+        <p>Clear saved credentials?</p>
+        <div class="confirm-buttons">
+          <button id="confirmYes" type="button">Yes</button>
+          <button id="confirmNo" type="button">No</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <form id="loginForm">
-    <label for="username">Username</label>
-    <input id="username" type="text" autocomplete="username" />
-
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" />
-
-  <label for="indexSecret">Indexsecret</label>
-  <input id="indexSecret" type="password" autocomplete="off" />
-
-    <div>
-      <button id="saveBtn" type="button">Save</button>
-      <button id="clearBtn" type="button">Clear</button>
-    </div>
-    <div style="margin-top:8px; display:flex; gap:8px; align-items:center">
-      <label style="display:flex; align-items:center; gap:6px"><input id="keepOpenChk" type="checkbox"/> Keep window open</label>
-      <button id="openWindowBtn" type="button">Open persistent window</button>
-    </div>
-    <div id="status"></div>
-  </form>
 
   <script src="js/popup.js"></script>
 </body>
