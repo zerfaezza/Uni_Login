@@ -28,7 +28,8 @@
         {
             "matches": [
                 "https://idp.tu-dresden.de/idp/profile/SAML2/Redirect/SSO*",
-                "https://bildungsportal.sachsen.de/opal/shiblogin*"
+                "https://bildungsportal.sachsen.de/opal/shiblogin*",
+                "https://selma.tu-dresden.de/APP/EXTERNALPAGES/*"
             ],
             "js": [
                 "js/main.js"

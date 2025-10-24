@@ -1,92 +1,92 @@
 "use strict";
-// Handle TU Dresden SSO login
-if (location.origin === "https://idp.tu-dresden.de" && location.pathname === "/idp/profile/SAML2/Redirect/SSO") {
+function getCredentials(callback) {
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['username', 'password', 'indexSecret'], callback);
+    }
+}
+function handleTUDresdenSSO() {
     const usernameEl = document.getElementById("username");
     const passwordEl = document.getElementById("password");
     const submitBtn = document.querySelector("body > main > section:nth-child(2) > form > div > div > button");
-    const Text = document.querySelector("#fudiscr-form > div:nth-child(2) > div > legend > nobr");
-    const IndexRegex = /position\s(?<Index1>\d{1,2}) & (?<Index2>\d{1,2})/g;
-    const inputBox = document.querySelector("#fudis_otp_input");
-    const validateButton = document.querySelector("#fudiscr-form > div.grid.md-2 > div:nth-child(1) > button");
-    const hasOtpFields = !!(inputBox && validateButton && Text);
-    const hasPasswordField = !!passwordEl;
-    function applyValues(items) {
-        if (hasOtpFields) {
-            tryFillIndexSecret(items);
-            return;
+    const otpText = document.querySelector("#fudiscr-form > div:nth-child(2) > div > legend > nobr");
+    const otpInputBox = document.querySelector("#fudis_otp_input");
+    const otpValidateBtn = document.querySelector("#fudiscr-form > div.grid.md-2 > div:nth-child(1) > button");
+    const tokenSelect = document.querySelector("#fudis_selected_token_ids_input");
+    const tokenButton = document.querySelector("#fudiscr-form > div.grid.md-2 > div > button");
+    if (tokenSelect && tokenButton) {
+        const firstOption = tokenSelect.querySelector("option:nth-child(1)");
+        if (firstOption) {
+            tokenSelect.value = firstOption.value;
+            tokenSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            setTimeout(() => tokenButton.click(), 300);
         }
-        if (hasPasswordField) {
-            if (usernameEl && items.username)
+        return;
+    }
+    if (otpInputBox && otpValidateBtn && otpText) {
+        getCredentials((items) => {
+            const text = (otpText.textContent || '').trim();
+            const regex = /position\s(?<Index1>\d{1,2}) & (?<Index2>\d{1,2})/g;
+            const match = regex.exec(text);
+            if (match && match.groups) {
+                const i1 = parseInt(match.groups.Index1, 10);
+                const i2 = parseInt(match.groups.Index2, 10);
+                const secret = items?.indexSecret || '';
+                if (secret && !Number.isNaN(i1) && !Number.isNaN(i2)) {
+                    const charA = secret.charAt(Math.max(0, i1 - 1)) || '';
+                    const charB = secret.charAt(Math.max(0, i2 - 1)) || '';
+                    const otp = (charA + charB).trim();
+                    if (otp && otpInputBox) {
+                        otpInputBox.value = otp;
+                        setTimeout(() => otpValidateBtn?.click(), 300);
+                    }
+                }
+            }
+        });
+        return;
+    }
+    if (usernameEl && passwordEl && submitBtn) {
+        getCredentials((items) => {
+            if (items.username)
                 usernameEl.value = items.username;
-            if (passwordEl && items.password)
+            if (items.password)
                 passwordEl.value = items.password;
-            if (submitBtn && usernameEl && passwordEl && usernameEl.value && passwordEl.value) {
+            if (usernameEl.value && passwordEl.value) {
                 setTimeout(() => submitBtn.click(), 300);
             }
-        }
-    }
-    function tryFillIndexSecret(items) {
-        if (!Text || !inputBox || !validateButton)
-            return;
-        const text = (Text.textContent || '').trim();
-        if (!text)
-            return;
-        IndexRegex.lastIndex = 0;
-        const m = IndexRegex.exec(text);
-        if (!m || !m.groups)
-            return;
-        const i1 = parseInt(m.groups.Index1, 10);
-        const i2 = parseInt(m.groups.Index2, 10);
-        if (Number.isNaN(i1) || Number.isNaN(i2))
-            return;
-        const secret = (items && items.indexSecret) || localStorage.getItem('indexSecret');
-        if (!secret)
-            return;
-        const s = String(secret).trim();
-        const charA = s.charAt(Math.max(0, i1 - 1)) || '';
-        const charB = s.charAt(Math.max(0, i2 - 1)) || '';
-        const otp = (charA + charB).trim();
-        if (!otp)
-            return;
-        inputBox.value = otp;
-        setTimeout(() => validateButton.click(), 300);
-    }
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-        try {
-            chrome.storage.local.get(['username', 'password', 'indexSecret'], (items) => {
-                applyValues(items);
-            });
-        }
-        catch (err) { /* ignore storage errors */ }
-    }
-    else if (typeof browser !== 'undefined' && browser.storage) {
-        try {
-            browser.storage.local.get(['username', 'password', 'indexSecret']).then((items) => { applyValues(items); }).catch(() => { });
-        }
-        catch (err) { /* ignore */ }
-    }
-    else {
-        const items = {
-            username: localStorage.getItem('username'),
-            password: localStorage.getItem('password'),
-            indexSecret: localStorage.getItem('indexSecret')
-        };
-        applyValues(items);
+        });
     }
 }
-// Handle university selection at bildungsportal.sachsen.de
-if (location.origin === "https://bildungsportal.sachsen.de" && location.pathname.startsWith("/opal/shiblogin")) {
+function handleBildungsportal() {
     const universitySelect = document.querySelector("#id2");
     const submitButton = document.querySelector("#id12");
     if (universitySelect && submitButton) {
-        // Set TU Dresden (value 13)
         universitySelect.value = "13";
-        // Trigger change event in case there are listeners
         universitySelect.dispatchEvent(new Event('change', { bubbles: true }));
-        // Click submit button after a short delay
-        setTimeout(() => {
-            if (submitButton)
-                submitButton.click();
-        }, 300);
+        setTimeout(() => submitButton.click(), 300);
     }
+}
+function handleSELMA() {
+    const usernameEl = document.querySelector("#field_user");
+    const passwordEl = document.querySelector("#field_pass");
+    const loginBtn = document.querySelector("#logIn_btn");
+    if (usernameEl && passwordEl && loginBtn) {
+        getCredentials((items) => {
+            if (items.username)
+                usernameEl.value = items.username;
+            if (items.password)
+                passwordEl.value = items.password;
+            if (usernameEl.value && passwordEl.value) {
+                setTimeout(() => loginBtn.click(), 300);
+            }
+        });
+    }
+}
+if (location.origin === "https://idp.tu-dresden.de" && location.pathname === "/idp/profile/SAML2/Redirect/SSO") {
+    handleTUDresdenSSO();
+}
+else if (location.origin === "https://bildungsportal.sachsen.de" && location.pathname.startsWith("/opal/shiblogin")) {
+    handleBildungsportal();
+}
+else if (location.origin === "https://selma.tu-dresden.de" && location.pathname.startsWith("/APP/EXTERNALPAGES/")) {
+    handleSELMA();
 }
