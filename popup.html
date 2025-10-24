@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Uni Login</title>
+  <style>
+    body { font-family: Arial, sans-serif; width:320px; padding:12px; }
+    label { display:block; margin-top:8px; font-size:13px }
+    input[type=text], input[type=password] { width:100%; padding:6px; box-sizing:border-box; margin-top:4px }
+    button { margin-top:12px; padding:8px 12px }
+    #status { margin-top:8px; font-size:12px; color:green }
+  </style>
+</head>
+<body>
+  <div style="display:flex; align-items:center; gap:8px">
+    <picture>
+      <source type="image/svg+xml" srcset="icons/logo.svg" />
+      <img src="icons/icon-128.png" alt="Logo" style="width:40px; height:40px; display:block;" />
+    </picture>
+    <h3 style="margin:0">Uni Login</h3>
+  </div>
+  <form id="loginForm">
+    <label for="username">Username</label>
+    <input id="username" type="text" autocomplete="username" />
+
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" />
+
+  <label for="indexSecret">Indexsecret</label>
+  <input id="indexSecret" type="password" autocomplete="off" />
+
+    <div>
+      <button id="saveBtn" type="button">Save</button>
+      <button id="clearBtn" type="button">Clear</button>
+    </div>
+    <div style="margin-top:8px; display:flex; gap:8px; align-items:center">
+      <label style="display:flex; align-items:center; gap:6px"><input id="keepOpenChk" type="checkbox"/> Keep window open</label>
+      <button id="openWindowBtn" type="button">Open persistent window</button>
+    </div>
+    <div id="status"></div>
+  </form>
+
+  <script src="js/popup.js"></script>
+</body>
+</html>
