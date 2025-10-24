@@ -1,3 +1,4 @@
+// Handle TU Dresden SSO login
 if (location.origin === "https://idp.tu-dresden.de" && location.pathname === "/idp/profile/SAML2/Redirect/SSO") {
     const usernameEl = document.getElementById("username") as HTMLInputElement | null;
     const passwordEl = document.getElementById("password") as HTMLInputElement | null;
@@ -67,3 +68,21 @@ if (location.origin === "https://idp.tu-dresden.de" && location.pathname === "/i
         applyValues(items);
     }
 }
+
+// Handle university selection at bildungsportal.sachsen.de
+if (location.origin === "https://bildungsportal.sachsen.de" && location.pathname.startsWith("/opal/shiblogin")) {
+    const universitySelect = document.querySelector("#id2") as HTMLSelectElement | null;
+    const submitButton = document.querySelector("#id12") as HTMLButtonElement | null;
+    
+    if (universitySelect && submitButton) {
+        // Set TU Dresden (value 13)
+        universitySelect.value = "13";
+        // Trigger change event in case there are listeners
+        universitySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        // Click submit button after a short delay
+        setTimeout(() => {
+            if (submitButton) submitButton.click();
+        }, 300);
+    }
+}
+

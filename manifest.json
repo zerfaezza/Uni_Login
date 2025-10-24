@@ -27,7 +27,8 @@
     "content_scripts": [
         {
             "matches": [
-                "https://idp.tu-dresden.de/idp/profile/SAML2/Redirect/SSO*"
+                "https://idp.tu-dresden.de/idp/profile/SAML2/Redirect/SSO*",
+                "https://bildungsportal.sachsen.de/opal/shiblogin*"
             ],
             "js": [
                 "js/main.js"
